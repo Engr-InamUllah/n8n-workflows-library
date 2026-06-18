@@ -1,0 +1,99 @@
+{
+    "nodes":  [
+                  {
+                      "id":  "2f912a05-ba40-4582-bef9-40aedfddf446",
+                      "name":  "Shopify Order Webhook",
+                      "type":  "n8n-nodes-base.webhook",
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "path":  "YOUR_SHOPIFY_WEBHOOK_PATH",
+                                         "responseMode":  "onReceived",
+                                         "httpMethod":  "POST"
+                                     },
+                      "typeVersion":  2
+                  },
+                  {
+                      "id":  "ab6fff91-571d-4e95-9bf0-5de9ae1a11e2",
+                      "name":  "Build Order Alert",
+                      "type":  "n8n-nodes-base.set",
+                      "position":  [
+                                       260,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "options":  {
+
+                                                     },
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "type":  "string",
+                                                                                     "name":  "text",
+                                                                                     "id":  "text",
+                                                                                     "value":  "=New order {{ $json.body.name }} ? {{ $json.body.total_price }}"
+                                                                                 }
+                                                                             ]
+                                                         }
+                                     },
+                      "typeVersion":  3.4
+                  },
+                  {
+                      "id":  "e45d924f-075a-4ea6-9f9e-e1172dc6bacd",
+                      "name":  "Send Slack Alert",
+                      "type":  "n8n-nodes-base.slack",
+                      "position":  [
+                                       520,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "otherOptions":  {
+
+                                                          },
+                                         "operation":  "post",
+                                         "channel":  "YOUR_SLACK_CHANNEL_ID",
+                                         "resource":  "message",
+                                         "text":  "={{ $json.text }}"
+                                     },
+                      "typeVersion":  2.3
+                  }
+              ],
+    "meta":  {
+                 "templateCredsSetupCompleted":  false
+             },
+    "tags":  [
+
+             ],
+    "name":  "Shopify Order to Slack",
+    "connections":  {
+                        "Build Order Alert":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Send Slack Alert",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Shopify Order Webhook":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Build Order Alert",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  }
+                    },
+    "versionId":  "YOUR_VERSION_ID",
+    "settings":  {
+                     "executionOrder":  "v1"
+                 },
+    "active":  false
+}

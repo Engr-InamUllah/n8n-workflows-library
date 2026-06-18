@@ -1,0 +1,94 @@
+{
+    "nodes":  [
+                  {
+                      "id":  "78ae941b-7675-4337-a543-b7f58b1d0d27",
+                      "name":  "Nightly Schedule",
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "expression":  "0 2 * * *",
+                                                                           "field":  "cronExpression"
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "typeVersion":  1.2
+                  },
+                  {
+                      "id":  "b4d37e69-fbaa-4772-95e8-273b9ad991a1",
+                      "name":  "Read Source Rows",
+                      "type":  "n8n-nodes-base.postgres",
+                      "position":  [
+                                       260,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "query":  "SELECT id, updated_at, payload FROM source_records WHERE updated_at \u003e {{$now.minus({days: 1}).toISO()}}",
+                                         "operation":  "executeQuery",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "typeVersion":  2.5
+                  },
+                  {
+                      "id":  "e4ad0607-1945-468b-ae80-bc167c9beef1",
+                      "name":  "Upsert Destination",
+                      "type":  "n8n-nodes-base.postgres",
+                      "position":  [
+                                       520,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "query":  "INSERT INTO destination_records(id, updated_at, payload) VALUES($1,$2,$3) ON CONFLICT(id) DO UPDATE SET updated_at=EXCLUDED.updated_at,payload=EXCLUDED.payload",
+                                         "operation":  "executeQuery",
+                                         "options":  {
+                                                         "queryReplacement":  "={{ [$json.id, $json.updated_at, $json.payload] }}"
+                                                     }
+                                     },
+                      "typeVersion":  2.5
+                  }
+              ],
+    "meta":  {
+                 "templateCredsSetupCompleted":  false
+             },
+    "tags":  [
+
+             ],
+    "name":  "Postgres Incremental Sync",
+    "connections":  {
+                        "Read Source Rows":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Upsert Destination",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Nightly Schedule":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Read Source Rows",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             }
+                    },
+    "versionId":  "YOUR_VERSION_ID",
+    "settings":  {
+                     "executionOrder":  "v1"
+                 },
+    "active":  false
+}

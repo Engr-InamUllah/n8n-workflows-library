@@ -1,0 +1,116 @@
+{
+    "nodes":  [
+                  {
+                      "id":  "713c22ac-c4fc-482c-9bb4-49ba276502e5",
+                      "name":  "Lead Webhook",
+                      "type":  "n8n-nodes-base.webhook",
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "path":  "YOUR_WEBHOOK_PATH",
+                                         "responseMode":  "onReceived",
+                                         "httpMethod":  "POST"
+                                     },
+                      "typeVersion":  2
+                  },
+                  {
+                      "id":  "7b05b50a-3112-4aaf-918a-92de87117936",
+                      "name":  "Normalize Lead",
+                      "type":  "n8n-nodes-base.set",
+                      "position":  [
+                                       260,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "options":  {
+
+                                                     },
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "type":  "string",
+                                                                                     "name":  "email",
+                                                                                     "id":  "lead-email",
+                                                                                     "value":  "={{ $json.body.email }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "type":  "string",
+                                                                                     "name":  "name",
+                                                                                     "id":  "lead-name",
+                                                                                     "value":  "={{ $json.body.name }}"
+                                                                                 }
+                                                                             ]
+                                                         }
+                                     },
+                      "typeVersion":  3.4
+                  },
+                  {
+                      "id":  "e9657624-4418-4128-a3e4-e30ec65aa8a4",
+                      "name":  "Append Lead",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "position":  [
+                                       520,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "columns":  {
+                                                         "mappingMode":  "autoMapInputData",
+                                                         "value":  {
+
+                                                                   }
+                                                     },
+                                         "sheetName":  {
+                                                           "value":  "Leads",
+                                                           "mode":  "name"
+                                                       },
+                                         "documentId":  {
+                                                            "value":  "YOUR_GOOGLE_SHEET_ID",
+                                                            "mode":  "id"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "typeVersion":  4.6
+                  }
+              ],
+    "meta":  {
+                 "templateCredsSetupCompleted":  false
+             },
+    "tags":  [
+
+             ],
+    "name":  "Lead Webhook to Google Sheets",
+    "connections":  {
+                        "Lead Webhook":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Normalize Lead",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "Normalize Lead":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Append Lead",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           }
+                    },
+    "versionId":  "YOUR_VERSION_ID",
+    "settings":  {
+                     "executionOrder":  "v1"
+                 },
+    "active":  false
+}

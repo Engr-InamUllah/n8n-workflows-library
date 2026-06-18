@@ -1,0 +1,106 @@
+{
+    "nodes":  [
+                  {
+                      "id":  "04237d6f-8fa8-4f83-986b-9c16710da969",
+                      "name":  "Manual Trigger",
+                      "type":  "n8n-nodes-base.manualTrigger",
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "parameters":  {
+
+                                     },
+                      "typeVersion":  1
+                  },
+                  {
+                      "id":  "b9623fd4-6d3f-4a3d-850f-e7a9a79fd0a4",
+                      "name":  "Example Input",
+                      "type":  "n8n-nodes-base.set",
+                      "position":  [
+                                       260,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "options":  {
+
+                                                     },
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "type":  "string",
+                                                                                     "name":  "email_text",
+                                                                                     "id":  "email",
+                                                                                     "value":  "Replace this with sanitized email content."
+                                                                                 }
+                                                                             ]
+                                                         }
+                                     },
+                      "typeVersion":  3.4
+                  },
+                  {
+                      "id":  "16c1af55-5f8c-4a04-a1bd-746d6283fe11",
+                      "name":  "Summarize Email",
+                      "type":  "@n8n/n8n-nodes-langchain.openAi",
+                      "position":  [
+                                       520,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "operation":  "message",
+                                         "resource":  "text",
+                                         "modelId":  {
+                                                         "value":  "YOUR_OPENAI_MODEL",
+                                                         "mode":  "list"
+                                                     },
+                                         "options":  {
+
+                                                     },
+                                         "messages":  {
+                                                          "values":  [
+                                                                         {
+                                                                             "content":  "=Summarize this email and list action items: {{ $json.email_text }}"
+                                                                         }
+                                                                     ]
+                                                      }
+                                     },
+                      "typeVersion":  1.8
+                  }
+              ],
+    "meta":  {
+                 "templateCredsSetupCompleted":  false
+             },
+    "tags":  [
+
+             ],
+    "name":  "AI Email Summary",
+    "connections":  {
+                        "Example Input":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Summarize Email",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Manual Trigger":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Example Input",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           }
+                    },
+    "versionId":  "YOUR_VERSION_ID",
+    "settings":  {
+                     "executionOrder":  "v1"
+                 },
+    "active":  false
+}

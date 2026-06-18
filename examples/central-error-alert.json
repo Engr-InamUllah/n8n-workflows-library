@@ -1,0 +1,109 @@
+{
+    "nodes":  [
+                  {
+                      "id":  "d19d27f2-bddd-4c13-a205-e755892eb9d6",
+                      "name":  "Workflow Error",
+                      "type":  "n8n-nodes-base.errorTrigger",
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "parameters":  {
+
+                                     },
+                      "typeVersion":  1
+                  },
+                  {
+                      "id":  "de7d5364-f7c5-4123-bb32-985e16e06fda",
+                      "name":  "Sanitize Error",
+                      "type":  "n8n-nodes-base.set",
+                      "position":  [
+                                       260,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "options":  {
+
+                                                     },
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "type":  "string",
+                                                                                     "name":  "workflow",
+                                                                                     "id":  "workflow",
+                                                                                     "value":  "={{ $json.workflow.name }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "type":  "string",
+                                                                                     "name":  "execution_id",
+                                                                                     "id":  "execution",
+                                                                                     "value":  "={{ $json.execution.id }}"
+                                                                                 },
+                                                                                 {
+                                                                                     "type":  "string",
+                                                                                     "name":  "message",
+                                                                                     "id":  "message",
+                                                                                     "value":  "={{ $json.execution.error.message }}"
+                                                                                 }
+                                                                             ]
+                                                         }
+                                     },
+                      "typeVersion":  3.4
+                  },
+                  {
+                      "id":  "e841009a-7076-4083-a7eb-fda039d20f87",
+                      "name":  "Send Error Alert",
+                      "type":  "n8n-nodes-base.slack",
+                      "position":  [
+                                       520,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "otherOptions":  {
+
+                                                          },
+                                         "operation":  "post",
+                                         "channel":  "YOUR_SLACK_CHANNEL_ID",
+                                         "resource":  "message",
+                                         "text":  "=Workflow {{ $json.workflow }} failed. Execution: {{ $json.execution_id }}"
+                                     },
+                      "typeVersion":  2.3
+                  }
+              ],
+    "meta":  {
+                 "templateCredsSetupCompleted":  false
+             },
+    "tags":  [
+
+             ],
+    "name":  "Central Error Alert",
+    "connections":  {
+                        "Workflow Error":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Sanitize Error",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "Sanitize Error":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "Send Error Alert",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           }
+                    },
+    "versionId":  "YOUR_VERSION_ID",
+    "settings":  {
+                     "executionOrder":  "v1"
+                 },
+    "active":  false
+}

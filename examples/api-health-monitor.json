@@ -1,0 +1,148 @@
+{
+    "nodes":  [
+                  {
+                      "id":  "9c654072-4340-4f91-84fb-e74516a47dfe",
+                      "name":  "Every Five Minutes",
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "field":  "minutes",
+                                                                           "minutesInterval":  5
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "typeVersion":  1.2
+                  },
+                  {
+                      "id":  "4e93d3da-53bd-48cc-a0a9-c42616ace764",
+                      "name":  "Check API",
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "position":  [
+                                       260,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "neverError":  true
+                                                                                       }
+                                                                      },
+                                                         "timeout":  10000
+                                                     },
+                                         "url":  "https://YOUR_API_HOST/health"
+                                     },
+                      "typeVersion":  4.2
+                  },
+                  {
+                      "id":  "6271c37a-6905-4692-8363-ccc1d0eb2cc0",
+                      "name":  "Is Healthy",
+                      "type":  "n8n-nodes-base.if",
+                      "position":  [
+                                       520,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "options":  {
+
+                                                     },
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "typeValidation":  "strict",
+                                                                            "leftValue":  "",
+                                                                            "caseSensitive":  true
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "operator":  {
+                                                                                                    "operation":  "equals",
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                   "rightValue":  "ok",
+                                                                                   "id":  "status",
+                                                                                   "leftValue":  "={{ $json.status }}"
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        }
+                                     },
+                      "typeVersion":  2
+                  },
+                  {
+                      "id":  "e662ae0e-4fdc-4e43-8e2d-4e8307ad3639",
+                      "name":  "Alert Slack",
+                      "type":  "n8n-nodes-base.slack",
+                      "position":  [
+                                       780,
+                                       120
+                                   ],
+                      "parameters":  {
+                                         "otherOptions":  {
+
+                                                          },
+                                         "operation":  "post",
+                                         "channel":  "YOUR_SLACK_CHANNEL_ID",
+                                         "resource":  "message",
+                                         "text":  "API health check failed for YOUR_API_HOST"
+                                     },
+                      "typeVersion":  2.3
+                  }
+              ],
+    "meta":  {
+                 "templateCredsSetupCompleted":  false
+             },
+    "tags":  [
+
+             ],
+    "name":  "API Health Monitor",
+    "connections":  {
+                        "Every Five Minutes":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Check API",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Is Healthy":  {
+                                           "main":  [
+                                                        [
+
+                                                        ],
+                                                        [
+                                                            {
+                                                                "node":  "Alert Slack",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       },
+                        "Check API":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Is Healthy",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      }
+                    },
+    "versionId":  "YOUR_VERSION_ID",
+    "settings":  {
+                     "executionOrder":  "v1"
+                 },
+    "active":  false
+}
