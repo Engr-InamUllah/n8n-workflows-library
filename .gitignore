@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+*.log
+node_modules/
+.n8n/
+credentials.json
+execution-data/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

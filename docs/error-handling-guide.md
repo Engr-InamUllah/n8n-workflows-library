@@ -1,0 +1,3 @@
+# Error Handling Guide
+
+Retry only transient failures and use backoff for rate limits. Do not retry invalid data indefinitely. Send rejected records to quarantine with workflow name, execution ID, timestamp, sanitized input reference, and error category. Use an Error Trigger workflow for operational alerts and high-severity tickets. Exclude credentials and sensitive payloads. Document replay and manual fallback procedures.
